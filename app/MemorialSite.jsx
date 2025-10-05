@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-/* -------- delete-token vault (per-browser ownership) -------- */
-const TOKEN_KEY = "memorial-delete-tokens";
+/* -------- local storage keys -------- */
+const TOKEN_KEY = "memorial-delete-tokens";       // per-post delete tokens
+const ADMIN_KEY = "memorial-admin-password";      // admin override (optional)
+
 function loadTokens() {
   if (typeof window === "undefined") return { clips: {}, messages: {} };
-  try {
-    return JSON.parse(localStorage.getItem(TOKEN_KEY)) ?? { clips: {}, messages: {} };
-  } catch {
-    return { clips: {}, messages: {} };
-  }
+  try { return JSON.parse(localStorage.getItem(TOKEN_KEY)) ?? { clips: {}, messages: {} }; }
+  catch { return { clips: {}, messages: {} }; }
 }
 function saveTokens(next) {
   if (typeof window === "undefined") return;
@@ -37,8 +36,16 @@ export default function MemorialSite() {
   const [playing, setPlaying] = useState({});
   const [tokens, setTokens] = useState({ clips: {}, messages: {} });
 
+  // admin
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminEnabled, setAdminEnabled] = useState(false);
+
   useEffect(() => {
     setTokens(loadTokens());
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(ADMIN_KEY);
+      if (saved) { setAdminPassword(saved); setAdminEnabled(true); }
+    }
   }, []);
 
   // initial load
@@ -179,12 +186,20 @@ export default function MemorialSite() {
   };
 
   const deleteClip = async (id) => {
-    const token = tokens.clips[id];
-    if (!token) return alert("This post can only be removed by its creator.");
+    const headers = {};
+    if (adminEnabled && adminPassword) headers["x-admin-password"] = adminPassword;
+
+    if (!headers["x-admin-password"]) {
+      const token = tokens.clips[id];
+      if (!token) return alert("This post can only be removed by its creator.");
+      headers["x-delete-token"] = token;
+    }
+
     if (!confirm("Delete this clip?")) return;
+
     const res = await fetch(`/api/clips?id=${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: { "x-delete-token": token },
+      headers,
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return alert(body?.error || "Could not delete.");
@@ -198,12 +213,20 @@ export default function MemorialSite() {
   };
 
   const deleteMessage = async (id) => {
-    const token = tokens.messages[id];
-    if (!token) return alert("This post can only be removed by its creator.");
+    const headers = {};
+    if (adminEnabled && adminPassword) headers["x-admin-password"] = adminPassword;
+
+    if (!headers["x-admin-password"]) {
+      const token = tokens.messages[id];
+      if (!token) return alert("This post can only be removed by its creator.");
+      headers["x-delete-token"] = token;
+    }
+
     if (!confirm("Delete this message?")) return;
+
     const res = await fetch(`/api/messages?id=${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: { "x-delete-token": token },
+      headers,
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) return alert(body?.error || "Could not delete.");
@@ -220,21 +243,24 @@ export default function MemorialSite() {
   return (
     <>
       <main className="container page-main">
+        {/* Header */}
         <div className="board-header">
           <div className="title-row">
             <img className="avatar" src="/avatar.jpg" alt="Profile" />
             <div className="title-text">
-              <h1 className="board-title">Alex — Afterman7</h1>
+              <h1 className="board-title">In Loving Memory of Alex — Afterman7</h1>
               <div className="board-sub">
                 1990 – 2025 · A bright, kind, and creative soul whose presence
                 touched countless lives.
               </div>
             </div>
           </div>
+
+          {/* Donate can wrap below on small screens */}
           <Link
             href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
             target="_blank"
-            className="btn"
+            className="btn donate-btn"
           >
             💜 Donate to the Family
           </Link>
@@ -247,6 +273,7 @@ export default function MemorialSite() {
           </div>
         )}
 
+        {/* Composers */}
         <div className="composer">
           <section className="section">
             <h2 style={{ margin: 0 }}>Add a Clip</h2>
@@ -283,6 +310,7 @@ export default function MemorialSite() {
           </section>
         </div>
 
+        {/* Mixed feed */}
         <div className="feed">
           {feed.length === 0 ? (
             <div className="section muted">No posts yet.</div>
@@ -331,7 +359,7 @@ export default function MemorialSite() {
                     <a className="link-btn" href={item.url} target="_blank" rel="noopener noreferrer">
                       Open on Twitch ↗
                     </a>
-                    {tokens.clips[item.id] && (
+                    {(tokens.clips[item.id] || adminEnabled) && (
                       <button className="btn-tonal btn" onClick={() => deleteClip(item.id)}>Delete</button>
                     )}
                   </div>
@@ -344,7 +372,7 @@ export default function MemorialSite() {
                   <div className="card-meta">{new Date(item.createdAt).toLocaleString()}</div>
                   <div>{item.body}</div>
 
-                  {tokens.messages[item.id] && (
+                  {(tokens.messages[item.id] || adminEnabled) && (
                     <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
                       <button className="btn-tonal btn" onClick={() => deleteMessage(item.id)}>
                         Delete
@@ -355,6 +383,46 @@ export default function MemorialSite() {
               )
             )
           )}
+        </div>
+
+        {/* Minimal admin panel at the bottom of the page content */}
+        <div className="section" style={{ marginTop: 16 }}>
+          <h3 style={{ marginTop: 0 }}>Admin</h3>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input
+              type="password"
+              className="input"
+              placeholder="Admin password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              style={{ maxWidth: 320 }}
+            />
+            {!adminEnabled ? (
+              <button
+                className="btn"
+                onClick={() => {
+                  if (!adminPassword) { alert("Enter the admin password"); return; }
+                  localStorage.setItem(ADMIN_KEY, adminPassword);
+                  setAdminEnabled(true);
+                }}
+              >
+                Enable admin
+              </button>
+            ) : (
+              <button
+                className="btn-tonal btn"
+                onClick={() => {
+                  localStorage.removeItem(ADMIN_KEY);
+                  setAdminEnabled(false);
+                }}
+              >
+                Disable admin
+              </button>
+            )}
+            <span className="muted" style={{ alignSelf: "center" }}>
+              {adminEnabled ? "Admin enabled — delete buttons visible on all posts." : "Enter password to enable admin deletes."}
+            </span>
+          </div>
         </div>
       </main>
 
