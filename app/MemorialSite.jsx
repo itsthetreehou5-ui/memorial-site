@@ -2,15 +2,15 @@
 import React from "react";
 
 export default function MemorialSite() {
-  /* ---------- Config ---------- */
+  /* ---------- Person Info ---------- */
   const person = {
     name: "Alex — Afterman7",
-    dates: "1990 – 2025",
+    dates: "1989 – 2025",
     avatar:
-      "https://images.unsplash.com/photo-1520975922284-8b456906c813?q=80&w=800&auto=format&fit=crop",
+      "https://thronecdn.com/users/veeOvBjBPFTvBdtaZr7PLKRufC62?version=1684245879163",
     tagline:
-      "A bright, kind, and creative soul whose presence touched countless lives.",
-    gofundme: "https://gofund.me/5ac54ab96",
+      "A beautifully empathetic, kind, and creative soul whose presence touchedand will forever touch countless lives.",
+    gofundme: "https://gofund.me/6e9e8fbf5",
   };
 
   /* ---------- State ---------- */
@@ -22,17 +22,14 @@ export default function MemorialSite() {
 
   const [filter, setFilter] = React.useState("");
 
-  // stable per-browser id (used to allow self-delete)
   const [clientId, setClientId] = React.useState("");
   const clientReady = Boolean(clientId);
 
-  // moderator
   const [modEnabled, setModEnabled] = React.useState(false);
   const [modToken, setModToken] = React.useState("");
 
-  /* ---------- Effects ---------- */
+  /* ---------- Load & ID ---------- */
   React.useEffect(() => {
-    // generate / read a stable browser id
     const key = "memorial-client-id";
     let id = localStorage.getItem(key);
     if (!id) {
@@ -41,17 +38,14 @@ export default function MemorialSite() {
     }
     setClientId(id);
 
-    // initial data load
     (async () => {
       try {
-        const [cRes, mRes] = await Promise.all([
-          fetch("/api/clips", { cache: "no-store" }),
-          fetch("/api/messages", { cache: "no-store" }),
+        const [c, m] = await Promise.all([
+          fetch("/api/clips", { cache: "no-store" }).then((r) => r.json()),
+          fetch("/api/messages", { cache: "no-store" }).then((r) => r.json()),
         ]);
-        const cJson = await cRes.json().catch(() => ({ clips: [] }));
-        const mJson = await mRes.json().catch(() => ({ messages: [] }));
-        setClips(cJson.clips ?? []);
-        setMessages(mJson.messages ?? []);
+        setClips(c.clips ?? []);
+        setMessages(m.messages ?? []);
       } catch {
         setClips([]);
         setMessages([]);
@@ -64,23 +58,18 @@ export default function MemorialSite() {
     typeof window !== "undefined" ? window.location.hostname : "localhost";
 
   const parseSlug = (input) => {
-    if (!input) return null;
     const m = String(input).match(
       /(?:clips\.twitch\.tv\/|twitch\.tv\/clip\/)?([A-Za-z0-9_-]+)$/
     );
     return m ? m[1] : null;
   };
 
-  const twitchURL = (slugOrUrl) => {
-    const slug = parseSlug(slugOrUrl);
-    if (!slug) return null;
-    return `https://clips.twitch.tv/embed?clip=${slug}&parent=${parent}&autoplay=false&muted=true`;
-  };
+  const twitchURL = (slug) =>
+    `https://clips.twitch.tv/embed?clip=${slug}&parent=${parent}&autoplay=false&muted=true`;
 
   const isoToReadable = (iso) => {
     try {
-      const d = new Date(iso);
-      return d.toLocaleString(undefined, {
+      return new Date(iso).toLocaleString(undefined, {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -97,14 +86,12 @@ export default function MemorialSite() {
   /* ---------- Handlers ---------- */
   async function addClip(e) {
     e.preventDefault();
-    if (!clientReady) return alert("Getting your session ready — try again in a second.");
+    if (!clientReady) return alert("Getting your session ready — try again soon.");
 
-    const title = (clipForm.title || "").trim();
-    const raw = (clipForm.url || "").trim();
-    if (!title || !raw) return;
-
+    const title = clipForm.title.trim();
+    const raw = clipForm.url.trim();
     const slug = parseSlug(raw);
-    if (!slug) return alert("That doesn’t look like a valid Twitch clip URL or slug.");
+    if (!title || !slug) return alert("Please enter a valid title and Twitch clip URL.");
 
     try {
       const res = await fetch("/api/clips", {
@@ -112,15 +99,12 @@ export default function MemorialSite() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          url: slug, // store slug only
+          url: slug,
           addedBy: clipForm.name || "Anonymous",
           addedById: clientId,
         }),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error);
       const { entry } = await res.json();
       setClips((prev) => [entry, ...prev]);
       setClipForm({ title: "", url: "", name: "" });
@@ -131,24 +115,23 @@ export default function MemorialSite() {
 
   async function addMsg(e) {
     e.preventDefault();
-    if (!clientReady) return alert("Getting your session ready — try again in a second.");
+    if (!clientReady) return alert("Getting your session ready — try again soon.");
 
-    const text = (msgForm.text || "").trim();
-    const name = (msgForm.name || "").trim() || "Anonymous";
+    const text = msgForm.text.trim();
     if (!text) return;
-
     try {
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, text, addedById: clientId }),
+        body: JSON.stringify({
+          name: msgForm.name || "Anonymous",
+          text,
+          addedById: clientId,
+        }),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error);
       const { entry } = await res.json();
-      setMessages((prev) => [entry, ...prev]);
+      setMessages((p) => [entry, ...p]);
       setMsgForm({ name: "", text: "" });
     } catch (err) {
       alert("Could not post message: " + err.message);
@@ -158,20 +141,16 @@ export default function MemorialSite() {
   async function removeItem(kind, id) {
     try {
       const headers = { "Content-Type": "application/json" };
-      if (modEnabled && modToken) headers["Authorization"] = `Bearer ${modToken}`;
-
+      if (modEnabled && modToken)
+        headers["Authorization"] = `Bearer ${modToken}`;
       const res = await fetch(`/api/${kind}?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
         headers,
         body: JSON.stringify({ addedById: clientId }),
       });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || `HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error);
       if (kind === "clips") setClips((p) => p.filter((x) => x.id !== id));
-      if (kind === "messages") setMessages((p) => p.filter((x) => x.id !== id));
+      else setMessages((p) => p.filter((x) => x.id !== id));
     } catch (err) {
       alert("Remove failed: " + err.message);
     }
@@ -179,30 +158,32 @@ export default function MemorialSite() {
 
   /* ---------- UI ---------- */
   return (
-    <div className="min-h-screen bg-surface text-on-surface">
+    <div className="min-h-screen bg-[var(--md-sys-color-surface)] text-[var(--md-sys-color-on-surface)]">
       {/* HERO */}
       <header className="relative overflow-hidden">
         <div
           className="absolute inset-0
-          bg-[radial-gradient(120%_80%_at_0%_0%,rgba(178,148,255,0.22),transparent_50%),radial-gradient(120%_80%_at_100%_100%,rgba(110,75,219,0.18),transparent_45%)]
-          "
+          bg-[radial-gradient(120%_80%_at_0%_0%,rgba(178,148,255,0.22),transparent_50%),radial-gradient(120%_80%_at_100%_100%,rgba(110,75,219,0.18),transparent_45%)]"
         />
         <div className="relative mx-auto max-w-5xl px-6 py-16 flex flex-col md:flex-row gap-8 items-center">
           <img
             src={person.avatar}
             alt=""
-            className="h-32 w-32 rounded-full object-cover shadow-md border border-outline-variant"
+            className="h-32 w-32 rounded-full object-cover shadow-md border border-[var(--md-sys-color-outline-variant)]"
           />
           <div>
             <h1 className="text-4xl font-bold">{person.name}</h1>
-            <p className="text-on-surface-variant mt-1">{person.dates}</p>
+            <p className="text-[var(--md-sys-color-on-surface-variant)] mt-1">
+              {person.dates}
+            </p>
             <p className="mt-4 text-lg max-w-prose">{person.tagline}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href={person.gofundme}
                 target="_blank"
                 rel="noreferrer"
-                className="bg-primary text-on-primary px-4 py-2 rounded-full shadow hover:bg-primary/90 transition"
+                className="bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]
+                           px-4 py-2 rounded-full shadow hover:opacity-90 transition"
               >
                 💚 Donate to the Family
               </a>
@@ -221,13 +202,17 @@ export default function MemorialSite() {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search clips…"
-              className="md:w-72 rounded-full border border-outline-variant bg-surface-container px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[--md-sys-color-primary]"
+              className="md:w-72 rounded-full border border-[var(--md-sys-color-outline-variant)]
+                         bg-[var(--md-sys-color-surface-container)] px-3 py-2 text-sm
+                         focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]"
             />
           </div>
 
           <form
             onSubmit={addClip}
-            className="grid gap-3 sm:grid-cols-[1fr_1fr_160px_auto] bg-surface-container p-4 rounded-xl shadow-sm border border-outline-variant"
+            className="grid gap-3 sm:grid-cols-[1fr_1fr_160px_auto]
+                       bg-[var(--md-sys-color-surface-container)]
+                       p-4 rounded-xl shadow-sm border border-[var(--md-sys-color-outline-variant)]"
           >
             <input
               required
@@ -252,7 +237,9 @@ export default function MemorialSite() {
             <button
               type="submit"
               disabled={!clientReady}
-              className="bg-primary text-on-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]
+                         rounded-full px-4 py-2 text-sm font-medium hover:opacity-90
+                         disabled:opacity-50 disabled:cursor-not-allowed"
             >
               + Add
             </button>
@@ -266,32 +253,30 @@ export default function MemorialSite() {
                 return (
                   <article
                     key={c.id}
-                    className="bg-surface-container rounded-xl shadow border border-outline-variant overflow-hidden"
+                    className="bg-[var(--md-sys-color-surface-container)] rounded-xl shadow
+                               border border-[var(--md-sys-color-outline-variant)] overflow-hidden"
                   >
                     <div className="aspect-video bg-black">
                       {src ? (
-                        <iframe
-                          src={src}
-                          allowFullScreen
-                          className="w-full h-full"
-                          title={c.title}
-                        />
+                        <iframe src={src} allowFullScreen className="w-full h-full" />
                       ) : (
-                        <div className="w-full h-full grid place-items-center text-on-surface-variant text-sm">
-                          Invalid Twitch clip
+                        <div className="w-full h-full grid place-items-center text-sm text-[var(--md-sys-color-on-surface-variant)]">
+                          Invalid clip
                         </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between p-3 text-sm">
                       <div>
                         <div className="font-medium">{c.title}</div>
-                        <div className="text-on-surface-variant">{c.addedBy}</div>
+                        <div className="text-[var(--md-sys-color-on-surface-variant)]">
+                          {c.addedBy}
+                        </div>
                       </div>
                       {canRemove(c) && (
                         <button
                           onClick={() => removeItem("clips", c.id)}
-                          className="text-on-surface-variant hover:text-error transition text-xs"
-                          title="Remove clip"
+                          className="text-[var(--md-sys-color-on-surface-variant)]
+                                     hover:text-[var(--md-sys-color-error)] transition text-xs"
                         >
                           ✕
                         </button>
@@ -306,10 +291,11 @@ export default function MemorialSite() {
         {/* MESSAGES */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Messages</h2>
-
           <form
             onSubmit={addMsg}
-            className="grid gap-3 sm:grid-cols-[180px_1fr_auto] bg-surface-container p-4 rounded-xl shadow-sm border border-outline-variant"
+            className="grid gap-3 sm:grid-cols-[180px_1fr_auto]
+                       bg-[var(--md-sys-color-surface-container)]
+                       p-4 rounded-xl shadow-sm border border-[var(--md-sys-color-outline-variant)]"
           >
             <input
               className="input"
@@ -327,7 +313,9 @@ export default function MemorialSite() {
             <button
               type="submit"
               disabled={!clientReady}
-              className="bg-primary text-on-primary rounded-full px-4 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]
+                         rounded-full px-4 py-2 text-sm font-medium hover:opacity-90
+                         disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Post
             </button>
@@ -336,17 +324,21 @@ export default function MemorialSite() {
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 mt-6">
             {messages.map((m) => (
               <div key={m.id} className="break-inside-avoid mb-6">
-                <div className="bg-surface-container border border-outline-variant rounded-xl p-4 shadow-sm relative">
+                <div
+                  className="bg-[var(--md-sys-color-surface-container)]
+                             border border-[var(--md-sys-color-outline-variant)]
+                             rounded-xl p-4 shadow-sm relative"
+                >
                   {canRemove(m) && (
                     <button
                       onClick={() => removeItem("messages", m.id)}
-                      className="absolute right-3 top-3 text-on-surface-variant hover:text-error text-xs"
-                      title="Remove message"
+                      className="absolute right-3 top-3 text-[var(--md-sys-color-on-surface-variant)]
+                                 hover:text-[var(--md-sys-color-error)] text-xs"
                     >
                       ✕
                     </button>
                   )}
-                  <div className="text-xs text-on-surface-variant">
+                  <div className="text-xs text-[var(--md-sys-color-on-surface-variant)]">
                     {isoToReadable(m.timestamp)}
                   </div>
                   <div className="mt-1 leading-relaxed whitespace-pre-wrap">
@@ -360,9 +352,10 @@ export default function MemorialSite() {
         </section>
       </main>
 
-      {/* FOOTER: Minimal Moderator Mode */}
-      <footer className="border-t border-outline-variant bg-surface-container-low py-4">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-on-surface-variant">
+      {/* FOOTER */}
+      <footer className="border-t border-[var(--md-sys-color-outline-variant)]
+                         bg-[var(--md-sys-color-surface-container-low)] py-4">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-[var(--md-sys-color-on-surface-variant)]">
           {!modEnabled ? (
             <form
               onSubmit={(e) => {
@@ -377,9 +370,13 @@ export default function MemorialSite() {
                 placeholder="Admin token"
                 value={modToken}
                 onChange={(e) => setModToken(e.target.value)}
-                className="rounded-full border border-outline-variant bg-surface px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[--md-sys-color-primary]"
+                className="rounded-full border border-[var(--md-sys-color-outline-variant)]
+                           bg-[var(--md-sys-color-surface)] px-3 py-1.5 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]"
               />
-              <button className="bg-primary text-on-primary rounded-full px-3 py-1 hover:bg-primary/90">
+              <button className="bg-[var(--md-sys-color-primary)]
+                                 text-[var(--md-sys-color-on-primary)]
+                                 rounded-full px-3 py-1 hover:opacity-90">
                 Enable
               </button>
             </form>
@@ -389,12 +386,12 @@ export default function MemorialSite() {
                 setModEnabled(false);
                 setModToken("");
               }}
-              className="px-3 py-1 rounded-full border border-outline-variant hover:bg-surface-variant/40"
+              className="px-3 py-1 rounded-full border border-[var(--md-sys-color-outline-variant)]
+                         hover:bg-[var(--md-sys-color-surface-variant)]/40"
             >
               Disable Moderator Mode
             </button>
           )}
-
           <p className="text-xs sm:text-end flex-1">
             Made with love · Material 3 style · Take care of your heart 💜
           </p>
