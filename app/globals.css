@@ -112,3 +112,21 @@ body{
 .chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#F1ECFF; color:#2A1E6F; border:1px solid var(--line); }
 .link-btn{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff; text-decoration:none; color:var(--ink); }
 .link-btn:hover{ box-shadow:var(--sh-1) }
+
+/* Title block should take room, wrap cleanly */
+.title-text{
+  flex: 1 1 420px;   /* grow, shrink, preferred width */
+  min-width: 0;      /* critical so text can wrap instead of overflow */
+}
+.board-title{
+  margin: 0;
+  line-height: 1.15;
+  text-wrap: balance;          /* nicer multi-line wrap (supported in modern browsers) */
+  overflow-wrap: anywhere;     /* allow long words to break if needed */
+}
+
+/* Keep the Donate button from shrinking the title */
+.board-header .btn{
+  flex-shrink: 0;
+}
+
