@@ -242,13 +242,17 @@ export default function MemorialSite() {
   /* ---- render ---- */
   return (
     <>
+      {/* NOTE: page-main lets the footer sit at the bottom via flex (set in globals.css) */}
       <main className="container page-main">
         {/* Header */}
         <div className="board-header">
           <div className="title-row">
             <img className="avatar" src="/avatar.jpg" alt="Profile" />
             <div className="title-text">
-              <h1 className="board-title">In Loving Memory of Alex — Afterman7</h1>
+              {/* If you added heading serif in CSS, this will pick it up */}
+              <h1 className="board-title heading-serif">
+                In Loving Memory of Alex — Afterman7
+              </h1>
               <div className="board-sub">
                 1989 – 2025 · A bright, kind, and creative soul whose presence
                 touched countless lives.
@@ -256,7 +260,7 @@ export default function MemorialSite() {
             </div>
           </div>
 
-          {/* Donate can wrap below on small screens (see .donate-btn CSS in globals) */}
+          {/* Donate can wrap below on small screens (governed by .donate-btn media rules) */}
           <Link
             href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
             target="_blank"
@@ -426,7 +430,7 @@ export default function MemorialSite() {
         </div>
       </main>
 
-      {/* Updated impactful footer */}
+      {/* Updated, impactful footer */}
       <footer className="footer">
         <p>
           Made with gratitude and love by <strong>Wicked_Kitten</strong>,{" "}
