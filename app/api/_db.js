@@ -1,5 +1,4 @@
-// Simple shared in-memory data across API route files.
-// (Resets on redeploy; use Vercel KV later for persistence.)
+// Simple shared in-memory store (resets on redeploy)
 export const CLIPS = [];
 export const MESSAGES = [];
 
