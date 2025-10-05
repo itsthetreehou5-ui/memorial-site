@@ -129,4 +129,33 @@ body{
 .board-header .btn{
   flex-shrink: 0;
 }
+/* ----- Page flex layout so footer anchors to bottom ----- */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.page-main {
+  flex: 1; /* makes main area take remaining height so footer sits at bottom */
+}
+
+/* ----- Slightly darker purple footer (sticky by layout) ----- */
+.site-footer {
+  background: #F0EAFF;           /* a touch darker than --surface */
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  padding: 16px;
+  text-align: center;
+}
+
+/* ----- Image on message cards ----- */
+.message-img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-1);
+  margin-top: 8px;
+  display: block;
+}
 
