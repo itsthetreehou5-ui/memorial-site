@@ -430,11 +430,7 @@ export default function MemorialSite() {
         <p>
     Made with gratitude and love by <strong>Wicked_Kitten</strong>,{" "}
     <strong>The Canopy Stream Team</strong>, and a host of friends and loved ones
-    whose hearts were touched by Alex’s light.
-  </p>
-  <p>
-    May this space remind us to check in with each other, take care of our hearts,
-    and hold close the memories that keep kindness alive. 💜
+    whose hearts were touched by Alex’s light.💜
   </p>
       </footer>
     </>
