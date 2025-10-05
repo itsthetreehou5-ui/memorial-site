@@ -1,5 +1,7 @@
+// postcss.config.js (no Tailwind; keep Autoprefixer if you want)
 const config = {
-  plugins: ["@tailwindcss/postcss"],
+  plugins: [
+    "autoprefixer"   // optional but nice
+  ],
 };
-
 export default config;
