@@ -1,14 +1,14 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "In Loving Memory of Alex – Afterman7",
-  description: "Community memorial site for Alex (Afterman7)",
+  title: "In Loving Memory of Alex — Afterman7",
+  description: "A loving and beautifully dempathetic, kind, and creative soul whose presence touched countless lives.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-[var(--md-sys-color-surface)] text-[var(--md-sys-color-on-surface)]">
+      <body>
         {children}
       </body>
     </html>
