@@ -256,7 +256,7 @@ export default function MemorialSite() {
             </div>
           </div>
 
-          {/* Donate can wrap below on small screens */}
+          {/* Donate can wrap below on small screens (see .donate-btn CSS in globals) */}
           <Link
             href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
             target="_blank"
@@ -385,7 +385,7 @@ export default function MemorialSite() {
           )}
         </div>
 
-        {/* Minimal admin panel at the bottom of the page content */}
+        {/* Minimal admin panel */}
         <div className="section" style={{ marginTop: 16 }}>
           <h3 style={{ marginTop: 0 }}>Admin</h3>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -420,18 +420,19 @@ export default function MemorialSite() {
               </button>
             )}
             <span className="muted" style={{ alignSelf: "center" }}>
-              {adminEnabled ? "Admin enabled — delete buttons visible on all posts." : "Enter password to enable admin abilities."}
+              {adminEnabled ? "Admin enabled — delete buttons visible on all posts." : "Enter password to enable admin deletes."}
             </span>
           </div>
         </div>
       </main>
 
-      <footer className="site-footer">
+      {/* Updated impactful footer */}
+      <footer className="footer">
         <p>
-    Made with gratitude and love by <strong>Wicked_Kitten</strong>,{" "}
-    <strong>The Canopy Stream Team</strong>, and a host of friends and loved ones
-    whose hearts were touched by Alex’s light.💜
-  </p>
+          Made with gratitude and love by <strong>Wicked_Kitten</strong>,{" "}
+          <strong>The Canopy Stream Team</strong>, and a host of friends and loved ones
+          whose hearts were touched by Alex’s light. 💜
+        </p>
       </footer>
     </>
   );
