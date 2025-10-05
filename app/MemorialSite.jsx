@@ -2,33 +2,26 @@
 import React from "react";
 
 export default function MemorialSite() {
-  /* ---------- Person Info ---------- */
   const person = {
     name: "Alex — Afterman7",
-    dates: "1989 – 2025",
+    dates: "1990 – 2025",
     avatar:
-      "https://thronecdn.com/users/veeOvBjBPFTvBdtaZr7PLKRufC62?version=1684245879163",
+      "https://images.unsplash.com/photo-1520975922284-8b456906c813?q=80&w=800&auto=format&fit=crop",
     tagline:
-      "A beautifully empathetic, kind, and creative soul whose presence touchedand will forever touch countless lives.",
-    gofundme: "https://gofund.me/6e9e8fbf5",
+      "A bright, kind, and creative soul whose presence touched countless lives.",
+    gofundme: "https://gofund.me/5ac54ab96",
   };
 
-  /* ---------- State ---------- */
   const [clips, setClips] = React.useState([]);
   const [messages, setMessages] = React.useState([]);
-
   const [clipForm, setClipForm] = React.useState({ title: "", url: "", name: "" });
   const [msgForm, setMsgForm] = React.useState({ name: "", text: "" });
-
   const [filter, setFilter] = React.useState("");
-
   const [clientId, setClientId] = React.useState("");
-  const clientReady = Boolean(clientId);
-
   const [modEnabled, setModEnabled] = React.useState(false);
   const [modToken, setModToken] = React.useState("");
+  const clientReady = Boolean(clientId);
 
-  /* ---------- Load & ID ---------- */
   React.useEffect(() => {
     const key = "memorial-client-id";
     let id = localStorage.getItem(key);
@@ -53,7 +46,6 @@ export default function MemorialSite() {
     })();
   }, []);
 
-  /* ---------- Helpers ---------- */
   const parent =
     typeof window !== "undefined" ? window.location.hostname : "localhost";
 
@@ -83,11 +75,9 @@ export default function MemorialSite() {
 
   const canRemove = (item) => modEnabled || item.addedById === clientId;
 
-  /* ---------- Handlers ---------- */
   async function addClip(e) {
     e.preventDefault();
     if (!clientReady) return alert("Getting your session ready — try again soon.");
-
     const title = clipForm.title.trim();
     const raw = clipForm.url.trim();
     const slug = parseSlug(raw);
@@ -116,7 +106,6 @@ export default function MemorialSite() {
   async function addMsg(e) {
     e.preventDefault();
     if (!clientReady) return alert("Getting your session ready — try again soon.");
-
     const text = msgForm.text.trim();
     if (!text) return;
     try {
@@ -156,10 +145,9 @@ export default function MemorialSite() {
     }
   }
 
-  /* ---------- UI ---------- */
   return (
     <div className="min-h-screen bg-[var(--md-sys-color-surface)] text-[var(--md-sys-color-on-surface)]">
-      {/* HERO */}
+      {/* HEADER */}
       <header className="relative overflow-hidden">
         <div
           className="absolute inset-0
@@ -169,13 +157,11 @@ export default function MemorialSite() {
           <img
             src={person.avatar}
             alt=""
-            className="h-32 w-32 rounded-full object-cover shadow-md border border-[var(--md-sys-color-outline-variant)]"
+            className="h-32 w-32 rounded-full object-cover shadow-md border"
           />
           <div>
             <h1 className="text-4xl font-bold">{person.name}</h1>
-            <p className="text-[var(--md-sys-color-on-surface-variant)] mt-1">
-              {person.dates}
-            </p>
+            <p className="opacity-80 mt-1">{person.dates}</p>
             <p className="mt-4 text-lg max-w-prose">{person.tagline}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
@@ -192,9 +178,9 @@ export default function MemorialSite() {
         </div>
       </header>
 
-      {/* MAIN */}
+      {/* MAIN CONTENT */}
       <main className="mx-auto max-w-5xl px-6 py-10 space-y-14">
-        {/* CLIPS */}
+        {/* CLIPS SECTION */}
         <section>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
             <h2 className="text-2xl font-semibold">Twitch Clips</h2>
@@ -202,9 +188,7 @@ export default function MemorialSite() {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Search clips…"
-              className="md:w-72 rounded-full border border-[var(--md-sys-color-outline-variant)]
-                         bg-[var(--md-sys-color-surface-container)] px-3 py-2 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]"
+              className="md:w-72 rounded-full border bg-[var(--md-sys-color-surface-container)] px-3 py-2 text-sm"
             />
           </div>
 
@@ -212,24 +196,24 @@ export default function MemorialSite() {
             onSubmit={addClip}
             className="grid gap-3 sm:grid-cols-[1fr_1fr_160px_auto]
                        bg-[var(--md-sys-color-surface-container)]
-                       p-4 rounded-xl shadow-sm border border-[var(--md-sys-color-outline-variant)]"
+                       p-4 rounded-xl shadow-sm border"
           >
             <input
               required
-              className="input"
+              className="rounded-full border bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm"
               placeholder="Clip title"
               value={clipForm.title}
               onChange={(e) => setClipForm({ ...clipForm, title: e.target.value })}
             />
             <input
               required
-              className="input"
+              className="rounded-full border bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm"
               placeholder="Clip URL or slug"
               value={clipForm.url}
               onChange={(e) => setClipForm({ ...clipForm, url: e.target.value })}
             />
             <input
-              className="input"
+              className="rounded-full border bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm"
               placeholder="Your name (optional)"
               value={clipForm.name}
               onChange={(e) => setClipForm({ ...clipForm, name: e.target.value })}
@@ -253,14 +237,13 @@ export default function MemorialSite() {
                 return (
                   <article
                     key={c.id}
-                    className="bg-[var(--md-sys-color-surface-container)] rounded-xl shadow
-                               border border-[var(--md-sys-color-outline-variant)] overflow-hidden"
+                    className="bg-[var(--md-sys-color-surface-container)] rounded-xl shadow border overflow-hidden"
                   >
                     <div className="aspect-video bg-black">
                       {src ? (
                         <iframe src={src} allowFullScreen className="w-full h-full" />
                       ) : (
-                        <div className="w-full h-full grid place-items-center text-sm text-[var(--md-sys-color-on-surface-variant)]">
+                        <div className="w-full h-full grid place-items-center text-sm opacity-70">
                           Invalid clip
                         </div>
                       )}
@@ -268,15 +251,12 @@ export default function MemorialSite() {
                     <div className="flex items-center justify-between p-3 text-sm">
                       <div>
                         <div className="font-medium">{c.title}</div>
-                        <div className="text-[var(--md-sys-color-on-surface-variant)]">
-                          {c.addedBy}
-                        </div>
+                        <div className="opacity-70">{c.addedBy}</div>
                       </div>
                       {canRemove(c) && (
                         <button
                           onClick={() => removeItem("clips", c.id)}
-                          className="text-[var(--md-sys-color-on-surface-variant)]
-                                     hover:text-[var(--md-sys-color-error)] transition text-xs"
+                          className="opacity-70 hover:text-red-400 transition text-xs"
                         >
                           ✕
                         </button>
@@ -288,24 +268,24 @@ export default function MemorialSite() {
           </div>
         </section>
 
-        {/* MESSAGES */}
+        {/* MESSAGES SECTION */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Messages</h2>
           <form
             onSubmit={addMsg}
             className="grid gap-3 sm:grid-cols-[180px_1fr_auto]
                        bg-[var(--md-sys-color-surface-container)]
-                       p-4 rounded-xl shadow-sm border border-[var(--md-sys-color-outline-variant)]"
+                       p-4 rounded-xl shadow-sm border"
           >
             <input
-              className="input"
+              className="rounded-full border bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm"
               placeholder="Your name (optional)"
               value={msgForm.name}
               onChange={(e) => setMsgForm({ ...msgForm, name: e.target.value })}
             />
             <textarea
               required
-              className="input min-h-[80px]"
+              className="rounded-xl border bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm min-h-[80px]"
               placeholder="Share a memory…"
               value={msgForm.text}
               onChange={(e) => setMsgForm({ ...msgForm, text: e.target.value })}
@@ -324,23 +304,16 @@ export default function MemorialSite() {
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 mt-6">
             {messages.map((m) => (
               <div key={m.id} className="break-inside-avoid mb-6">
-                <div
-                  className="bg-[var(--md-sys-color-surface-container)]
-                             border border-[var(--md-sys-color-outline-variant)]
-                             rounded-xl p-4 shadow-sm relative"
-                >
+                <div className="bg-[var(--md-sys-color-surface-container)] border rounded-xl p-4 shadow-sm relative">
                   {canRemove(m) && (
                     <button
                       onClick={() => removeItem("messages", m.id)}
-                      className="absolute right-3 top-3 text-[var(--md-sys-color-on-surface-variant)]
-                                 hover:text-[var(--md-sys-color-error)] text-xs"
+                      className="absolute right-3 top-3 opacity-70 hover:text-red-400 text-xs"
                     >
                       ✕
                     </button>
                   )}
-                  <div className="text-xs text-[var(--md-sys-color-on-surface-variant)]">
-                    {isoToReadable(m.timestamp)}
-                  </div>
+                  <div className="text-xs opacity-70">{isoToReadable(m.timestamp)}</div>
                   <div className="mt-1 leading-relaxed whitespace-pre-wrap">
                     {m.text}
                   </div>
@@ -353,9 +326,8 @@ export default function MemorialSite() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[var(--md-sys-color-outline-variant)]
-                         bg-[var(--md-sys-color-surface-container-low)] py-4">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-[var(--md-sys-color-on-surface-variant)]">
+      <footer className="border-t bg-[var(--md-sys-color-surface-container-low)] py-4">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm opacity-80">
           {!modEnabled ? (
             <form
               onSubmit={(e) => {
@@ -370,13 +342,9 @@ export default function MemorialSite() {
                 placeholder="Admin token"
                 value={modToken}
                 onChange={(e) => setModToken(e.target.value)}
-                className="rounded-full border border-[var(--md-sys-color-outline-variant)]
-                           bg-[var(--md-sys-color-surface)] px-3 py-1.5 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]"
+                className="rounded-full border bg-[var(--md-sys-color-surface)] px-3 py-1.5 text-sm"
               />
-              <button className="bg-[var(--md-sys-color-primary)]
-                                 text-[var(--md-sys-color-on-primary)]
-                                 rounded-full px-3 py-1 hover:opacity-90">
+              <button className="bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full px-3 py-1 hover:opacity-90">
                 Enable
               </button>
             </form>
@@ -386,14 +354,13 @@ export default function MemorialSite() {
                 setModEnabled(false);
                 setModToken("");
               }}
-              className="px-3 py-1 rounded-full border border-[var(--md-sys-color-outline-variant)]
-                         hover:bg-[var(--md-sys-color-surface-variant)]/40"
+              className="px-3 py-1 rounded-full border hover:bg-[var(--md-sys-color-surface-variant)]/40"
             >
               Disable Moderator Mode
             </button>
           )}
           <p className="text-xs sm:text-end flex-1">
-            Made with love · Material 3 style · Take care of your heart 💜
+            Made with love · Take care of your heart 💜
           </p>
         </div>
       </footer>
