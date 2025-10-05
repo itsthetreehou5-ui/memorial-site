@@ -24,3 +24,33 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* ---------- Material 3 color tokens & helpers ---------- */
+
+:root {
+  --md-sys-color-primary: #16a34a; /* emerald 600 */
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-surface: #fdfcfb;
+  --md-sys-color-on-surface: #1c1b1f;
+  --md-sys-color-surface-container: #f3f3f3;
+  --md-sys-color-surface-container-low: #fafafa;
+  --md-sys-color-outline-variant: #dcdcdc;
+}
+
+/* Material 3 utility classes (used in MemorialSite.jsx) */
+.bg-primary         { background-color: var(--md-sys-color-primary); }
+.text-on-primary    { color: var(--md-sys-color-on-primary); }
+
+.bg-surface         { background-color: var(--md-sys-color-surface); }
+.text-on-surface    { color: var(--md-sys-color-on-surface); }
+
+.bg-surface-container { background-color: var(--md-sys-color-surface-container); }
+.bg-surface-container-low { background-color: var(--md-sys-color-surface-container-low); }
+
+.border-outline-variant { border-color: var(--md-sys-color-outline-variant); }
+
+.text-on-surface-variant { color: #555555; }
+
+/* Input styling shortcut (Tailwind + CSS combo) */
+.input {
+  @apply rounded-full border border-outline-variant bg-surface px-3 py-2 text-sm focus:ring-2 focus:ring-primary;
+}
