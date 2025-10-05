@@ -2,89 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ---------------------------------------------------------
-   Material 3 (Violet / Lavender) Tokens
-   --------------------------------------------------------- */
+/* ---- Material 3 (Violet / Lavender) tokens ---- */
+:root{
+  --md-sys-color-primary:#B294FF;
+  --md-sys-color-on-primary:#2B0F49;
 
-:root {
-  --md-sys-color-primary: #B294FF;
-  --md-sys-color-on-primary: #2B0F49;
+  --md-sys-color-surface:#160E1D;
+  --md-sys-color-on-surface:#EEE5FF;
+  --md-sys-color-on-surface-variant:#CDBBEE;
 
-  --md-sys-color-surface: #160E1D;
-  --md-sys-color-on-surface: #EEE5FF;
-  --md-sys-color-on-surface-variant: #CDBBEE;
+  --md-sys-color-surface-container-low:#1B1023;
+  --md-sys-color-surface-container:#22132C;
+  --md-sys-color-surface-variant:#2A1635;
 
-  --md-sys-color-surface-container-low: #1B1023;
-  --md-sys-color-surface-container: #22132C;
-  --md-sys-color-surface-variant: #2A1635;
+  --md-sys-color-outline-variant:#CFB6FF;
+  --md-sys-color-outline:#9E7FE0;
 
-  --md-sys-color-outline-variant: #CFB6FF;
-  --md-sys-color-outline: #9E7FE0;
-
-  --md-sys-color-error: #FFB3B3;
-  --md-sys-color-on-error: #3B0A0A;
+  --md-sys-color-error:#FFB3B3;
+  --md-sys-color-on-error:#3B0A0A;
 }
 
-/* Optional light variant */
-@media (prefers-color-scheme: light) {
-  :root {
-    --md-sys-color-primary: #6E4BDB;
-    --md-sys-color-on-primary: #FFFFFF;
+@media (prefers-color-scheme: light){
+  :root{
+    --md-sys-color-primary:#6E4BDB;
+    --md-sys-color-on-primary:#FFFFFF;
 
-    --md-sys-color-surface: #FBF7FF;
-    --md-sys-color-on-surface: #1B1023;
-    --md-sys-color-on-surface-variant: #4C3C66;
+    --md-sys-color-surface:#FBF7FF;
+    --md-sys-color-on-surface:#1B1023;
+    --md-sys-color-on-surface-variant:#4C3C66;
 
-    --md-sys-color-surface-container-low: #F7F2FF;
-    --md-sys-color-surface-container: #EFE6FF;
-    --md-sys-color-surface-variant: #E9DEFF;
+    --md-sys-color-surface-container-low:#F7F2FF;
+    --md-sys-color-surface-container:#EFE6FF;
+    --md-sys-color-surface-variant:#E9DEFF;
 
-    --md-sys-color-outline-variant: #BFA7FF;
-    --md-sys-color-outline: #8F73E6;
+    --md-sys-color-outline-variant:#BFA7FF;
+    --md-sys-color-outline:#8F73E6;
 
-    --md-sys-color-error: #BA1A1A;
-    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error:#BA1A1A;
+    --md-sys-color-on-error:#FFFFFF;
   }
 }
 
-/* Base page styling */
-html, body {
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Inter", Segoe UI,
-    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+/* Base page */
+html,body{
+  background:var(--md-sys-color-surface);
+  color:var(--md-sys-color-on-surface);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Inter",Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
 }
-html { scroll-behavior: smooth; }
-:focus-visible {
-  outline: 2px solid var(--md-sys-color-outline);
-  outline-offset: 2px;
-}
+html{ scroll-behavior:smooth; }
+:focus-visible{ outline:2px solid var(--md-sys-color-outline); outline-offset:2px; }
 
-/* -------- Helpers (NO @apply to custom utilities) -------- */
-
-/* Rounded input used in forms */
-.input {
-  border: 1px solid var(--md-sys-color-outline-variant);
-  background: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  padding: 0.5rem 0.75rem;          /* py-2 px-3 */
-  border-radius: 9999px;            /* rounded-full */
-  font-size: 0.875rem;              /* text-sm */
-  line-height: 1.25rem;
+/* Helpers (NO @apply) */
+.input{
+  border:1px solid var(--md-sys-color-outline-variant);
+  background:var(--md-sys-color-surface);
+  color:var(--md-sys-color-on-surface);
+  padding:0.5rem 0.75rem;       /* py-2 px-3 */
+  border-radius:9999px;         /* rounded-full */
+  font-size:0.875rem; line-height:1.25rem;
 }
-textarea.input {
-  border-radius: 0.75rem;           /* nicer for textareas */
-}
-.input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--md-sys-color-primary); /* focus ring */
-}
-
-/* Card containers (optional) */
-.card {
-  background: var(--md-sys-color-surface-container);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-color: var(--md-sys-color-outline-variant);
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+textarea.input{ border-radius:0.75rem; }
+.input:focus{
+  outline:none;
+  box-shadow:0 0 0 2px var(--md-sys-color-primary);
 }
