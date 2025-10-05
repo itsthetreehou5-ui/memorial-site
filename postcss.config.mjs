@@ -1,7 +1,7 @@
-// postcss.config.js (no Tailwind; keep Autoprefixer if you want)
+// postcss.config.js
 const config = {
   plugins: [
-    "autoprefixer"   // optional but nice
+    "autoprefixer" // optional; helps with vendor prefixes
   ],
 };
 export default config;
