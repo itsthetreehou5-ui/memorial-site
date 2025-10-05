@@ -7,7 +7,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Material 3 Violet Palette (linked to your CSS variables)
         primary: "var(--md-sys-color-primary)",
         "on-primary": "var(--md-sys-color-on-primary)",
         surface: "var(--md-sys-color-surface)",
@@ -21,17 +20,5 @@ module.exports = {
       },
     },
   },
-  safelist: [
-    "bg-surface",
-    "bg-surface-container",
-    "bg-surface-container-low",
-    "bg-surface-variant",
-    "border-outline-variant",
-    "text-on-surface",
-    "text-on-surface-variant",
-    "bg-primary",
-    "text-on-primary",
-    "text-error",
-  ],
   plugins: [],
 };
