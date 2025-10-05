@@ -1,77 +1,67 @@
-/* ---------------------------------------------------------
-   globals.css  —  Material 3 (Violet / Lavender) + Tailwind
-   --------------------------------------------------------- */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* -------- Material 3 tokens: DARK-leaning (screenshot vibe) -------- */
+/* ---------------------------------------------------------
+   Material 3 (Violet / Lavender) Tokens
+   --------------------------------------------------------- */
+
 :root {
-  /* Core brand */
-  --md-sys-color-primary:            #B294FF;  /* lavender accent */
-  --md-sys-color-on-primary:         #2B0F49;
+  --md-sys-color-primary: #B294FF;
+  --md-sys-color-on-primary: #2B0F49;
 
-  /* Surfaces */
-  --md-sys-color-surface:            #160E1D;  /* page bg (very dark purple) */
-  --md-sys-color-on-surface:         #EEE5FF;  /* main text */
-  --md-sys-color-on-surface-variant: #CDBBEE;  /* secondary text */
+  --md-sys-color-surface: #160E1D;
+  --md-sys-color-on-surface: #EEE5FF;
+  --md-sys-color-on-surface-variant: #CDBBEE;
 
-  --md-sys-color-surface-container-low: #1B1023; /* section bg */
-  --md-sys-color-surface-container:     #22132C; /* cards */
-  --md-sys-color-surface-variant:       #2A1635; /* alt panels */
+  --md-sys-color-surface-container-low: #1B1023;
+  --md-sys-color-surface-container: #22132C;
+  --md-sys-color-surface-variant: #2A1635;
 
-  /* Outlines / states */
-  --md-sys-color-outline-variant:    #CFB6FF;   /* light lavender stroke */
-  --md-sys-color-outline:            #9E7FE0;   /* focused/hover stroke */
+  --md-sys-color-outline-variant: #CFB6FF;
+  --md-sys-color-outline: #9E7FE0;
 
-  /* Feedback */
-  --md-sys-color-error:              #FFB3B3;
-  --md-sys-color-on-error:           #3B0A0A;
+  --md-sys-color-error: #FFB3B3;
+  --md-sys-color-on-error: #3B0A0A;
 }
 
-/* -------- Optional: Light scheme (keeps violet brand) -------- */
+/* Light-mode option */
 @media (prefers-color-scheme: light) {
   :root {
-    --md-sys-color-primary:            #6E4BDB;
-    --md-sys-color-on-primary:         #FFFFFF;
-
-    --md-sys-color-surface:            #FBF7FF;
-    --md-sys-color-on-surface:         #1B1023;
+    --md-sys-color-primary: #6E4BDB;
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-surface: #FBF7FF;
+    --md-sys-color-on-surface: #1B1023;
     --md-sys-color-on-surface-variant: #4C3C66;
-
     --md-sys-color-surface-container-low: #F7F2FF;
-    --md-sys-color-surface-container:     #EFE6FF;
-    --md-sys-color-surface-variant:       #E9DEFF;
-
-    --md-sys-color-outline-variant:    #BFA7FF;
-    --md-sys-color-outline:            #8F73E6;
-
-    --md-sys-color-error:              #BA1A1A;
-    --md-sys-color-on-error:           #FFFFFF;
+    --md-sys-color-surface-container: #EFE6FF;
+    --md-sys-color-surface-variant: #E9DEFF;
+    --md-sys-color-outline-variant: #BFA7FF;
+    --md-sys-color-outline: #8F73E6;
+    --md-sys-color-error: #BA1A1A;
+    --md-sys-color-on-error: #FFFFFF;
   }
 }
 
-/* -------- Base page styles -------- */
-html, body {
+/* Base */
+html,
+body {
   background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Inter", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: ui-sans-serif, system-ui, -apple-system, "Inter", Segoe UI,
+    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
-
-/* Smooth scrolling & nicer focus */
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 :focus-visible {
   outline: 2px solid var(--md-sys-color-outline);
   outline-offset: 2px;
 }
 
-/* -------- Small utility class used in the app -------- */
+/* Helper used throughout */
 .input {
-  @apply rounded-full border border-outline-variant bg-surface px-3 py-2 text-sm
-         focus:outline-none focus:ring-2 focus:ring-[--md-sys-color-primary];
+  @apply rounded-full border border-[var(--md-sys-color-outline-variant)]
+         bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm
+         focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)];
 }
-
-/* You can add tiny helpers here if needed:
-   .elev-1 { box-shadow: 0 1px 2px rgba(0,0,0,.25); }
-*/
