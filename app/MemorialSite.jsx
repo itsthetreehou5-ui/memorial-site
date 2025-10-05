@@ -250,7 +250,7 @@ export default function MemorialSite() {
             <div className="title-text">
               <h1 className="board-title">In Loving Memory of Alex — Afterman7</h1>
               <div className="board-sub">
-                1990 – 2025 · A bright, kind, and creative soul whose presence
+                1989 – 2025 · A bright, kind, and creative soul whose presence
                 touched countless lives.
               </div>
             </div>
@@ -420,14 +420,22 @@ export default function MemorialSite() {
               </button>
             )}
             <span className="muted" style={{ alignSelf: "center" }}>
-              {adminEnabled ? "Admin enabled — delete buttons visible on all posts." : "Enter password to enable admin deletes."}
+              {adminEnabled ? "Admin enabled — delete buttons visible on all posts." : "Enter password to enable admin abilities."}
             </span>
           </div>
         </div>
       </main>
 
       <footer className="site-footer">
-        Made with love · Take care of your heart 💜
+        <p>
+    Made with gratitude and love by <strong>Wicked_Kitten</strong>,{" "}
+    <strong>The Canopy Stream Team</strong>, and a host of friends and loved ones
+    whose hearts were touched by Alex’s light.
+  </p>
+  <p>
+    May this space remind us to check in with each other, take care of our hearts,
+    and hold close the memories that keep kindness alive. 💜
+  </p>
       </footer>
     </>
   );
