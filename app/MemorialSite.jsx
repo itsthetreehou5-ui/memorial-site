@@ -227,3 +227,132 @@ export default function MemorialSite() {
               onChange={(e) => setClipUrl(e.target.value)}
             />
             <input
+              className="input"
+              placeholder="Your name (optional)"
+              value={clipName}
+              onChange={(e) => setClipName(e.target.value)}
+              style={{ gridColumn: "1 / -1" }}
+            />
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 10 }}>
+            <button className="btn" onClick={addClip} disabled={busy}>
+              {busy ? "Adding…" : "Add Clip"}
+            </button>
+          </div>
+        </section>
+
+        {/* Message composer */}
+        <section className="section">
+          <h2 style={{ marginTop: 0 }}>Post a Message</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <input
+              className="input"
+              placeholder="Your name (optional)"
+              value={msgName}
+              onChange={(e) => setMsgName(e.target.value)}
+            />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <textarea
+                className="textarea"
+                placeholder="Share a memory…"
+                value={memory}
+                onChange={(e) => setMemory(e.target.value)}
+              />
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 10 }}>
+            <button className="btn" onClick={postMessage} disabled={busy}>
+              {busy ? "Posting…" : "Post Message"}
+            </button>
+          </div>
+        </section>
+      </div>
+
+      {/* Mixed feed */}
+      <div className="feed">
+        {feed.length === 0 ? (
+          <div className="section muted">No posts yet.</div>
+        ) : (
+          feed.map((item) =>
+            item.type === "clip" ? (
+              <article className="card" key={`c-${item.id}`}>
+                <h3 className="card-title">{item.title}</h3>
+                <div className="card-meta">
+                  by {item.author || "Anonymous"} •{" "}
+                  {new Date(item.createdAt).toLocaleString()}
+                </div>
+
+                {/* Thumbnail -> on click switch to iframe */}
+                {playing[item.id] ? (
+                  (() => {
+                    const src = embedSrcFor(item);
+                    return src ? (
+                      <div className="embed" style={{ aspectRatio: "16/9" }}>
+                        <iframe
+                          src={src}
+                          allowFullScreen
+                          scrolling="no"
+                          frameBorder="0"
+                          width="100%"
+                          height="100%"
+                          title={item.title}
+                        />
+                      </div>
+                    ) : (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">
+                        {item.url}
+                      </a>
+                    );
+                  })()
+                ) : (
+                  <div className="embed" style={{ aspectRatio: "16/9" }}>
+                    {thumbs[item.id] ? (
+                      <img src={thumbs[item.id]} alt={item.title} />
+                    ) : (
+                      // fallback if oEmbed thumb failed
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "grid",
+                          placeItems: "center",
+                          color: "#fff",
+                        }}
+                      >
+                        Preview unavailable
+                      </div>
+                    )}
+                    <div
+                      className="play"
+                      onClick={() => setPlaying((p) => ({ ...p, [item.id]: true }))}
+                    >
+                      <span className="btn">▶︎ Play</span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ marginTop: 8 }}>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">
+                    {item.url}
+                  </a>
+                </div>
+              </article>
+            ) : (
+              <article className="card" key={`m-${item.id}`}>
+                <div className="card-title">{item.name || "Anonymous"}</div>
+                <div className="card-meta">
+                  {new Date(item.createdAt).toLocaleString()}
+                </div>
+                <div>{item.body}</div>
+              </article>
+            )
+          )
+        )}
+      </div>
+
+      <p className="muted" style={{ marginTop: 18 }}>
+        Made with love · Take care of your heart 💜
+      </p>
+    </main>
+  );
+}
