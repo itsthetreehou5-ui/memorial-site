@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { MESSAGES } from "../../_db";
+import { MESSAGES } from "../../../_db";  // <-- three dots, not two
+
 
 // POST /api/messages/:id/image
 // Headers: x-delete-token: <creator's token>
