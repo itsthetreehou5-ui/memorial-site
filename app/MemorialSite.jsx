@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /* -------- delete-token vault (per-browser ownership) -------- */
 const TOKEN_KEY = "memorial-delete-tokens";
@@ -18,7 +18,6 @@ function saveTokens(next) {
   localStorage.setItem(TOKEN_KEY, JSON.stringify(next));
 }
 
-/* -------- component -------- */
 export default function MemorialSite() {
   // data
   const [clips, setClips] = useState([]);
@@ -37,6 +36,9 @@ export default function MemorialSite() {
   const [thumbs, setThumbs] = useState({});
   const [playing, setPlaying] = useState({});
   const [tokens, setTokens] = useState({ clips: {}, messages: {} });
+
+  // refs for image upload inputs (per message)
+  const fileInputsRef = useRef({});
 
   useEffect(() => {
     setTokens(loadTokens());
@@ -222,231 +224,300 @@ export default function MemorialSite() {
     });
   };
 
+  // Trigger file picker for a given message id
+  const openFilePicker = (id) => {
+    if (!fileInputsRef.current[id]) return;
+    fileInputsRef.current[id].click();
+  };
+
+  // Handle chosen file and upload to /api/messages/:id/image
+  const onSelectImage = async (id, ev) => {
+    const token = tokens.messages[id];
+    if (!token) {
+      alert("Only the post creator can add an image.");
+      return;
+    }
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    // Basic size/type guard (optional)
+    if (!file.type.startsWith("image/")) return alert("Please choose an image file.");
+    if (file.size > 5 * 1024 * 1024) return alert("Please choose an image under 5MB.");
+
+    const form = new FormData();
+    form.append("file", file);
+
+    const res = await fetch(`/api/messages/${encodeURIComponent(id)}/image`, {
+      method: "POST",
+      headers: { "x-delete-token": token },
+      body: form,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return alert(data?.error || "Upload failed.");
+    }
+    // Update the message with returned imageUrl
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, imageUrl: data.message.imageUrl } : m))
+    );
+    // reset input
+    ev.target.value = "";
+  };
+
   /* ---- render ---- */
   return (
-    <main className="container">
-      {/* Header with avatar and wrapped title */}
-      <div className="board-header">
-        <div className="title-row">
-          <img className="avatar" src="/avatar.jpg" alt="Profile" />
-          <div className="title-text">
-            <h1 className="board-title">Alex — Afterman7</h1>
-            <div className="board-sub">
-              1990 – 2025 · A bright, kind, and creative soul whose presence
-              touched countless lives.
+    <>
+      {/* Give the main area flex:1 so the footer anchors to bottom */}
+      <main className="container page-main">
+        {/* Header with avatar and wrapped title */}
+        <div className="board-header">
+          <div className="title-row">
+            <img className="avatar" src="/avatar.jpg" alt="Profile" />
+            <div className="title-text">
+              <h1 className="board-title">Alex — Afterman7</h1>
+              <div className="board-sub">
+                1990 – 2025 · A bright, kind, and creative soul whose presence
+                touched countless lives.
+              </div>
             </div>
           </div>
+          <Link
+            href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
+            target="_blank"
+            className="btn"
+          >
+            💜 Donate to the Family
+          </Link>
         </div>
-        <Link
-          href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
-          target="_blank"
-          className="btn"
-        >
-          💜 Donate to the Family
-        </Link>
-      </div>
 
-      {error && (
-        <div
-          className="section"
-          style={{ background: "#FFF2F4", borderColor: "#F6C7D1" }}
-        >
-          <strong style={{ color: "#7a1339" }}>Error:</strong>{" "}
-          <span style={{ color: "#7a1339" }}>{error}</span>
-        </div>
-      )}
-
-      {/* Equal-height, always-visible composers */}
-      <div className="composer">
-        {/* Clip composer */}
-        <section className="section">
-          <h2 style={{ margin: 0 }}>Add a Clip</h2>
-          <div className="fields">
-            <input
-              className="input"
-              placeholder="Clip title"
-              value={clipTitle}
-              onChange={(e) => setClipTitle(e.target.value)}
-            />
-            <input
-              className="input"
-              placeholder="Clip URL or slug"
-              value={clipUrl}
-              onChange={(e) => setClipUrl(e.target.value)}
-            />
-            <input
-              className="input full"
-              placeholder="Your name (optional)"
-              value={clipName}
-              onChange={(e) => setClipName(e.target.value)}
-            />
+        {error && (
+          <div
+            className="section"
+            style={{ background: "#FFF2F4", borderColor: "#F6C7D1" }}
+          >
+            <strong style={{ color: "#7a1339" }}>Error:</strong>{" "}
+            <span style={{ color: "#7a1339" }}>{error}</span>
           </div>
-          <div className="actions">
-            <button className="btn" onClick={addClip} disabled={busy}>
-              {busy ? "Adding…" : "Add Clip"}
-            </button>
-          </div>
-        </section>
+        )}
 
-        {/* Message composer */}
-        <section className="section">
-          <h2 style={{ margin: 0 }}>Post a Message</h2>
-          <div className="fields">
-            <input
-              className="input"
-              placeholder="Your name (optional)"
-              value={msgName}
-              onChange={(e) => setMsgName(e.target.value)}
-            />
-            <div className="full">
-              <textarea
-                className="textarea textarea--compact"
-                placeholder="Share a memory…"
-                value={memory}
-                onChange={(e) => setMemory(e.target.value)}
+        {/* Equal-height, always-visible composers */}
+        <div className="composer">
+          {/* Clip composer */}
+          <section className="section">
+            <h2 style={{ margin: 0 }}>Add a Clip</h2>
+            <div className="fields">
+              <input
+                className="input"
+                placeholder="Clip title"
+                value={clipTitle}
+                onChange={(e) => setClipTitle(e.target.value)}
+              />
+              <input
+                className="input"
+                placeholder="Clip URL or slug"
+                value={clipUrl}
+                onChange={(e) => setClipUrl(e.target.value)}
+              />
+              <input
+                className="input full"
+                placeholder="Your name (optional)"
+                value={clipName}
+                onChange={(e) => setClipName(e.target.value)}
               />
             </div>
-          </div>
-          <div className="actions">
-            <button className="btn" onClick={postMessage} disabled={busy}>
-              {busy ? "Posting…" : "Post Message"}
-            </button>
-          </div>
-        </section>
-      </div>
+            <div className="actions">
+              <button className="btn" onClick={addClip} disabled={busy}>
+                {busy ? "Adding…" : "Add Clip"}
+              </button>
+            </div>
+          </section>
 
-      {/* Mixed feed */}
-      <div className="feed">
-        {feed.length === 0 ? (
-          <div className="section muted">No posts yet.</div>
-        ) : (
-          feed.map((item) =>
-            item.type === "clip" ? (
-              <article className="card" key={`c-${item.id}`}>
-                <h3 className="card-title" style={{ marginTop: 0 }}>
-                  {item.title}
-                </h3>
+          {/* Message composer */}
+          <section className="section">
+            <h2 style={{ margin: 0 }}>Post a Message</h2>
+            <div className="fields">
+              <input
+                className="input"
+                placeholder="Your name (optional)"
+                value={msgName}
+                onChange={(e) => setMsgName(e.target.value)}
+              />
+              <div className="full">
+                <textarea
+                  className="textarea textarea--compact"
+                  placeholder="Share a memory…"
+                  value={memory}
+                  onChange={(e) => setMemory(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn" onClick={postMessage} disabled={busy}>
+                {busy ? "Posting…" : "Post Message"}
+              </button>
+            </div>
+          </section>
+        </div>
 
-                <div className="meta-row">
-                  <span className="chip">
-                    by {item.author?.trim() || "Anonymous"}
-                  </span>
-                  <span className="chip">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </span>
-                </div>
+        {/* Mixed feed */}
+        <div className="feed">
+          {feed.length === 0 ? (
+            <div className="section muted">No posts yet.</div>
+          ) : (
+            feed.map((item) =>
+              item.type === "clip" ? (
+                <article className="card" key={`c-${item.id}`}>
+                  <h3 className="card-title" style={{ marginTop: 0 }}>
+                    {item.title}
+                  </h3>
 
-                {playing[item.id] ? (
-                  (() => {
-                    const src = embedSrcFor(item);
-                    return src ? (
-                      <div className="embed rounded" style={{ aspectRatio: "16/9" }}>
-                        <iframe
-                          src={src}
-                          allowFullScreen
-                          scrolling="no"
-                          frameBorder="0"
-                          width="100%"
-                          height="100%"
-                          title={item.title}
-                        />
-                      </div>
-                    ) : (
-                      <a
-                        className="link-btn"
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Open on Twitch ↗
-                      </a>
-                    );
-                  })()
-                ) : (
-                  <div className="embed rounded" style={{ aspectRatio: "16/9" }}>
-                    {thumbs[item.id] ? (
-                      <img src={thumbs[item.id]} alt={item.title} />
-                    ) : (
+                  <div className="meta-row">
+                    <span className="chip">
+                      by {item.author?.trim() || "Anonymous"}
+                    </span>
+                    <span className="chip">
+                      {new Date(item.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+
+                  {playing[item.id] ? (
+                    (() => {
+                      const src = embedSrcFor(item);
+                      return src ? (
+                        <div className="embed rounded" style={{ aspectRatio: "16/9" }}>
+                          <iframe
+                            src={src}
+                            allowFullScreen
+                            scrolling="no"
+                            frameBorder="0"
+                            width="100%"
+                            height="100%"
+                            title={item.title}
+                          />
+                        </div>
+                      ) : (
+                        <a
+                          className="link-btn"
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Open on Twitch ↗
+                        </a>
+                      );
+                    })()
+                  ) : (
+                    <div className="embed rounded" style={{ aspectRatio: "16/9" }}>
+                      {thumbs[item.id] ? (
+                        <img src={thumbs[item.id]} alt={item.title} />
+                      ) : (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "grid",
+                            placeItems: "center",
+                            color: "#fff",
+                          }}
+                        >
+                          Preview unavailable
+                        </div>
+                      )}
                       <div
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          display: "grid",
-                          placeItems: "center",
-                          color: "#fff",
-                        }}
+                        className="play"
+                        onClick={() =>
+                          setPlaying((p) => ({ ...p, [item.id]: true }))
+                        }
                       >
-                        Preview unavailable
+                        <span className="btn">▶︎ Play</span>
                       </div>
-                    )}
-                    <div
-                      className="play"
-                      onClick={() =>
-                        setPlaying((p) => ({ ...p, [item.id]: true }))
-                      }
-                    >
-                      <span className="btn">▶︎ Play</span>
                     </div>
-                  </div>
-                )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: 10,
-                    gap: 8,
-                  }}
-                >
-                  <a
-                    className="link-btn"
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Open on Twitch ↗
-                  </a>
-                  {tokens.clips[item.id] && (
-                    <button
-                      className="btn-tonal btn"
-                      onClick={() => deleteClip(item.id)}
-                    >
-                      Delete
-                    </button>
                   )}
-                </div>
-              </article>
-            ) : (
-              <article className="card" key={`m-${item.id}`}>
-                <div className="card-title" style={{ marginTop: 0 }}>
-                  {item.name || "Anonymous"}
-                </div>
-                <div className="card-meta">
-                  {new Date(item.createdAt).toLocaleString()}
-                </div>
-                <div>{item.body}</div>
-                {tokens.messages[item.id] && (
-                  <div
-                    style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}
-                  >
-                    <button
-                      className="btn-tonal btn"
-                      onClick={() => deleteMessage(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </article>
-            )
-          )
-        )}
-      </div>
 
-      <p className="muted" style={{ marginTop: 18 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: 10,
+                      gap: 8,
+                    }}
+                  >
+                    <a
+                      className="link-btn"
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open on Twitch ↗
+                    </a>
+                    {tokens.clips[item.id] && (
+                      <button
+                        className="btn-tonal btn"
+                        onClick={() => deleteClip(item.id)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </article>
+              ) : (
+                <article className="card" key={`m-${item.id}`}>
+                  <div className="card-title" style={{ marginTop: 0 }}>
+                    {item.name || "Anonymous"}
+                  </div>
+                  <div className="card-meta">
+                    {new Date(item.createdAt).toLocaleString()}
+                  </div>
+                  <div>{item.body}</div>
+
+                  {/* Show image if attached */}
+                  {item.imageUrl && (
+                    <img className="message-img" src={item.imageUrl} alt="Attached" />
+                  )}
+
+                  {/* Own-message controls: Add image + Delete */}
+                  {tokens.messages[item.id] && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        marginTop: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <button
+                        className="btn-tonal btn"
+                        onClick={() => openFilePicker(item.id)}
+                      >
+                        Add image
+                      </button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        ref={(el) => (fileInputsRef.current[item.id] = el)}
+                        onChange={(ev) => onSelectImage(item.id, ev)}
+                      />
+                      <button
+                        className="btn-tonal btn"
+                        onClick={() => deleteMessage(item.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </article>
+              )
+            )
+          )}
+        </div>
+      </main>
+
+      {/* Sticky, slightly-darker purple footer */}
+      <footer className="site-footer">
         Made with love · Take care of your heart 💜
-      </p>
-    </main>
+      </footer>
+    </>
   );
 }
