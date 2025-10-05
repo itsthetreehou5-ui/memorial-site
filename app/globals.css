@@ -24,33 +24,52 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-/* ---------- Material 3 color tokens & helpers ---------- */
+/* ---------- Material 3: Violet / Lavender (Dark-leaning) ---------- */
+/* Always-dark variant that matches your screenshot. If you want auto
+   light/dark, see the optional block further below. */
 
 :root {
-  --md-sys-color-primary: #16a34a; /* emerald 600 */
-  --md-sys-color-on-primary: #ffffff;
-  --md-sys-color-surface: #fdfcfb;
-  --md-sys-color-on-surface: #1c1b1f;
-  --md-sys-color-surface-container: #f3f3f3;
-  --md-sys-color-surface-container-low: #fafafa;
-  --md-sys-color-outline-variant: #dcdcdc;
+  /* Core */
+  --md-sys-color-primary:            #B294FF; /* lavender accent */
+  --md-sys-color-on-primary:         #2B0F49;
+
+  /* Surfaces */
+  --md-sys-color-surface:            #160E1D; /* page background (very dark purple) */
+  --md-sys-color-on-surface:         #EEE5FF; /* main text (near-white lavender) */
+  --md-sys-color-surface-container-low: #1B1023; /* section bg */
+  --md-sys-color-surface-container:  #22132C; /* cards */
+  --md-sys-color-surface-variant:    #2A1635; /* alt panels */
+
+  /* Outlines & states */
+  --md-sys-color-outline-variant:    #CFB6FF; /* light lavender strokes */
+  --md-sys-color-outline:            #9E7FE0; /* darker stroke on hover/focus */
+  --md-sys-color-error:              #FFB3B3;
+  --md-sys-color-on-error:           #3B0A0A;
 }
 
-/* Material 3 utility classes (used in MemorialSite.jsx) */
-.bg-primary         { background-color: var(--md-sys-color-primary); }
-.text-on-primary    { color: var(--md-sys-color-on-primary); }
+/* Utility classes used in MemorialSite.jsx */
+.bg-primary               { background-color: var(--md-sys-color-primary); }
+.text-on-primary          { color: var(--md-sys-color-on-primary); }
 
-.bg-surface         { background-color: var(--md-sys-color-surface); }
-.text-on-surface    { color: var(--md-sys-color-on-surface); }
+.bg-surface               { background-color: var(--md-sys-color-surface); }
+.text-on-surface          { color: var(--md-sys-color-on-surface); }
 
-.bg-surface-container { background-color: var(--md-sys-color-surface-container); }
+.bg-surface-container     { background-color: var(--md-sys-color-surface-container); }
 .bg-surface-container-low { background-color: var(--md-sys-color-surface-container-low); }
+.bg-surface-variant       { background-color: var(--md-sys-color-surface-variant); }
 
-.border-outline-variant { border-color: var(--md-sys-color-outline-variant); }
+.border-outline-variant   { border-color: var(--md-sys-color-outline-variant); }
+.text-on-surface-variant  { color: #CDBBEE; }
+.text-error               { color: var(--md-sys-color-error); }
 
-.text-on-surface-variant { color: #555555; }
-
-/* Input styling shortcut (Tailwind + CSS combo) */
+/* Inputs/buttons shortcut */
 .input {
-  @apply rounded-full border border-outline-variant bg-surface px-3 py-2 text-sm focus:ring-2 focus:ring-primary;
+  @apply rounded-full border border-outline-variant bg-surface px-3 py-2 text-sm
+         focus:outline-none focus:ring-2 focus:ring-[--md-sys-color-primary];
+}
+
+/* Page base */
+html, body {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
 }
