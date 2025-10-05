@@ -25,43 +25,66 @@
   --md-sys-color-on-error: #3B0A0A;
 }
 
-/* Light-mode option */
+/* Optional light variant */
 @media (prefers-color-scheme: light) {
   :root {
     --md-sys-color-primary: #6E4BDB;
     --md-sys-color-on-primary: #FFFFFF;
+
     --md-sys-color-surface: #FBF7FF;
     --md-sys-color-on-surface: #1B1023;
     --md-sys-color-on-surface-variant: #4C3C66;
+
     --md-sys-color-surface-container-low: #F7F2FF;
     --md-sys-color-surface-container: #EFE6FF;
     --md-sys-color-surface-variant: #E9DEFF;
+
     --md-sys-color-outline-variant: #BFA7FF;
     --md-sys-color-outline: #8F73E6;
+
     --md-sys-color-error: #BA1A1A;
     --md-sys-color-on-error: #FFFFFF;
   }
 }
 
-/* Base */
-html,
-body {
+/* Base page styling */
+html, body {
   background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
   font-family: ui-sans-serif, system-ui, -apple-system, "Inter", Segoe UI,
     Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 :focus-visible {
   outline: 2px solid var(--md-sys-color-outline);
   outline-offset: 2px;
 }
 
-/* Helper used throughout */
+/* -------- Helpers (NO @apply to custom utilities) -------- */
+
+/* Rounded input used in forms */
 .input {
-  @apply rounded-full border border-[var(--md-sys-color-outline-variant)]
-         bg-[var(--md-sys-color-surface)] px-3 py-2 text-sm
-         focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)];
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  padding: 0.5rem 0.75rem;          /* py-2 px-3 */
+  border-radius: 9999px;            /* rounded-full */
+  font-size: 0.875rem;              /* text-sm */
+  line-height: 1.25rem;
+}
+textarea.input {
+  border-radius: 0.75rem;           /* nicer for textareas */
+}
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary); /* focus ring */
+}
+
+/* Card containers (optional) */
+.card {
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-color: var(--md-sys-color-outline-variant);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
