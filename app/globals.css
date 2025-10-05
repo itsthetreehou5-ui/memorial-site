@@ -125,3 +125,11 @@ body{
 
 /* Message image style */
 .message-img { width:100%; height:auto; border-radius:14px; border:1px solid var(--line); box-shadow:var(--sh-1); margin-top:8px; display:block; }
+
+/* Donate button drops below the title on smaller screens */
+@media (max-width: 820px){
+  .board-header { align-items: flex-start; }
+  .donate-btn { width: 100%; order: 2; }   /* full-width under title */
+  .title-row { order: 1; }
+}
+
