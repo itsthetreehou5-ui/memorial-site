@@ -1,9 +1,8 @@
-// app/api/submit/route.ts
-import { kv } from '@vercel/kv';
 import { NextRequest } from 'next/server';
+import { redis } from '@/lib/redis';
 
 export async function POST(req: NextRequest) {
-  const body = await req.json(); // { name, message, videoUrl }
+  const body = await req.json();
   const { name, message, videoUrl } = body ?? {};
 
   if (!name || !message) {
@@ -19,10 +18,8 @@ export async function POST(req: NextRequest) {
     createdAt: Date.now(),
   };
 
-  await kv.json.set(`submission:${id}`, '$', submission);
-  await kv.lpush('submissions', id);
+  await redis.set(`submission:${id}`, submission);
+  await redis.lpush('submissions', id);
 
   return Response.json({ ok: true, id });
 }
-
-
