@@ -1,13 +1,15 @@
+/* Plain CSS only — no Tailwind directives here */
+
+/* ---- Theme tokens ---- */
 :root{
-  /* Light, subtle purple scheme */
   --primary:#6C56CC;
   --on-primary:#fff;
 
-  --surface:#FAF8FF;     /* page background */
-  --card:#FFFFFF;        /* card base */
+  --surface:#FAF8FF;
+  --card:#FFFFFF;
   --ink:#19161F;
   --ink-2:#5B5667;
-  --line:#E8E3F7;        /* soft borders */
+  --line:#E8E3F7;
 
   --r-lg:18px; --r-md:14px; --r-sm:10px;
   --s-1:6px; --s-2:10px; --s-3:14px; --s-4:20px; --s-5:28px;
@@ -44,8 +46,10 @@ body{
   object-fit:cover; background:#fff; border:1px solid var(--line);
   box-shadow: 0 2px 6px rgba(22,16,40,.06) inset, 0 0 0 3px rgba(108,86,204,.08);
 }
-.board-title{ margin:0; letter-spacing:-.02em; font-size: clamp(28px, 3vw, 34px); }
+.title-text{ flex:1 1 420px; min-width:0; }
+.board-title{ margin:0; line-height:1.15; text-wrap:balance; overflow-wrap:anywhere; }
 .board-sub{ margin:.25rem 0 0; color:var(--ink-2) }
+.board-header .btn{ flex-shrink:0; }
 
 /* Buttons */
 .btn{
@@ -67,6 +71,7 @@ body{
 .card{
   background:#fff; border:1px solid var(--line); border-radius:var(--r-lg);
   padding:18px; box-shadow:var(--sh-1); transition:transform .12s ease, box-shadow .2s ease;
+  word-break: break-word;
 }
 .card:hover{ transform:translateY(-2px); box-shadow:var(--sh-2) }
 .card-title{ font-weight:700; margin:0 0 6px }
@@ -110,52 +115,13 @@ body{
 /* Meta chips + link button */
 .meta-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:var(--ink-2); font-size:13px; margin:4px 0 10px; }
 .chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#F1ECFF; color:#2A1E6F; border:1px solid var(--line); }
-.link-btn{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff; text-decoration:none; color:var(--ink); }
+.link-btn{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff; text-decoration:none; color:#var(--ink); }
 .link-btn:hover{ box-shadow:var(--sh-1) }
 
-/* Title block should take room, wrap cleanly */
-.title-text{
-  flex: 1 1 420px;   /* grow, shrink, preferred width */
-  min-width: 0;      /* critical so text can wrap instead of overflow */
-}
-.board-title{
-  margin: 0;
-  line-height: 1.15;
-  text-wrap: balance;          /* nicer multi-line wrap (supported in modern browsers) */
-  overflow-wrap: anywhere;     /* allow long words to break if needed */
-}
+/* Layout for sticky footer */
+.page { min-height: 100vh; display:flex; flex-direction:column; }
+.page-main { flex: 1; }
+.site-footer { background:#F0EAFF; border-top:1px solid var(--line); color:var(--ink-2); padding:16px; text-align:center; }
 
-/* Keep the Donate button from shrinking the title */
-.board-header .btn{
-  flex-shrink: 0;
-}
-/* ----- Page flex layout so footer anchors to bottom ----- */
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.page-main {
-  flex: 1; /* makes main area take remaining height so footer sits at bottom */
-}
-
-/* ----- Slightly darker purple footer (sticky by layout) ----- */
-.site-footer {
-  background: #F0EAFF;           /* a touch darker than --surface */
-  border-top: 1px solid var(--line);
-  color: var(--ink-2);
-  padding: 16px;
-  text-align: center;
-}
-
-/* ----- Image on message cards ----- */
-.message-img {
-  width: 100%;
-  height: auto;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  box-shadow: var(--sh-1);
-  margin-top: 8px;
-  display: block;
-}
-
+/* Message image style */
+.message-img { width:100%; height:auto; border-radius:14px; border:1px solid var(--line); box-shadow:var(--sh-1); margin-top:8px; display:block; }
