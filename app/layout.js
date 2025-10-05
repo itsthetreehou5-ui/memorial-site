@@ -8,7 +8,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      {/* NOTE: the 'page' class is used to anchor the footer at the bottom */}
+      <body className="page">{children}</body>
     </html>
   );
 }
