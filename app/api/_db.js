@@ -1,9 +1,10 @@
-// Simple shared in-memory store (resets on redeploy)
-export const CLIPS = [];
+// super simple in-memory stores (reset on each server restart)
 export const MESSAGES = [];
+export const CLIPS = [];
 
-export function randToken() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+// random token helper
+export function randToken(len = 32) {
+  const bytes = new Uint8Array(len);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
