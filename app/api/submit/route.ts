@@ -1,8 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
+// app/api/submit/route.ts
+import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  await redis.lpush('submissions', JSON.stringify(body));
-  return NextResponse.json({ ok: true });
+  try {
+    const body = await req.json();
+    // TODO: persist somewhere (Vercel KV / Upstash / Postgres). For now, echo back.
+    const id = crypto.randomUUID();
+    return NextResponse.json({ ok: true, id, body });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message ?? "submit failed" }, { status: 500 });
+  }
 }
