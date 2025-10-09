@@ -1,26 +1,26 @@
-// app/api/upload/route.ts
-import { put } from '@vercel/blob';
-import { NextRequest } from 'next/server';
+// app/api/upload/route.js
+import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs'; // allows larger uploads than edge
+export const runtime = "nodejs"; // allows larger uploads than 'edge'
 
-export async function POST(req: NextRequest) {
-  const form = await req.formData();
-  const file = form.get('file') as File | null;
+export async function POST(req) {
+  try {
+    const form = await req.formData();
+    const file = form.get("file");
 
-  if (!file) return new Response('Missing file', { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "No file uploaded." }, { status: 400 });
+    }
 
-  if (!file.type.startsWith('video/')) {
-    return new Response('Only video files allowed', { status: 415 });
+    // TODO: persist the file somewhere durable (see notes below)
+    // Example placeholder: read bytes (in Node runtime this is supported)
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Do something with `buffer` (e.g., upload to Vercel Blob / S3 / etc.)
+    // For now just return success
+    return NextResponse.json({ ok: true, name: file.name, size: buffer.length });
+  } catch (err) {
+    return NextResponse.json({ error: err?.message || "Upload failed" }, { status: 500 });
   }
-
-  const key = `videos/${Date.now()}-${file.name}`;
-
-  const blob = await put(key, file, {
-    access: 'public',
-    contentType: file.type,
-    addRandomSuffix: false,
-  });
-
-  return Response.json({ url: blob.url, pathname: blob.pathname });
 }
