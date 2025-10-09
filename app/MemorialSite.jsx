@@ -262,7 +262,7 @@ export default function MemorialSite() {
 
           {/* Donate can wrap below on small screens (governed by .donate-btn media rules) */}
           <Link
-            href="https://www.gofundme.com/manage/in-loving-memory-of-alex-afterman7-family-support"
+            href="https://www.gofundme.com/f/in-loving-memory-of-alex-afterman7-family-support"
             target="_blank"
             className="btn donate-btn"
           >
