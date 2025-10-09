@@ -1,25 +1,15 @@
-import { NextRequest } from 'next/server';
-import { redis } from '@/lib/redis';
+// app/api/submit/route.ts
+import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { name, message, videoUrl } = body ?? {};
-
-  if (!name || !message) {
-    return new Response('Missing name or message', { status: 400 });
+  try {
+    const body = await req.json();
+    // TODO: persist somewhere (Vercel KV / Upstash / Postgres). For now, echo back.
+    const id = crypto.randomUUID();
+    return NextResponse.json({ ok: true, id, body });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message ?? "submit failed" }, { status: 500 });
   }
-
-  const id = crypto.randomUUID();
-  const submission = {
-    id,
-    name,
-    message,
-    videoUrl: videoUrl ?? null,
-    createdAt: Date.now(),
-  };
-
-  await redis.set(`submission:${id}`, submission);
-  await redis.lpush('submissions', id);
-
-  return Response.json({ ok: true, id });
 }
